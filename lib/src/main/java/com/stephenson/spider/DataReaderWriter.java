@@ -13,9 +13,8 @@ import java.net.URLEncoder;
 import java.util.List;
 
 import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
 
-public class SocketManagerAndReaderWriter {
+public class DataReaderWriter {
 	
 	final String DIRECTORY = "/home/cole/SpiderFiles";
 	final String ADMINURL = "https://smt-stage.qa.siliconmtn.com/sb/admintool";
@@ -27,7 +26,7 @@ public class SocketManagerAndReaderWriter {
 	
 	private StringBuilder cookies = new StringBuilder();
 	
-	public SocketManagerAndReaderWriter(String url) {
+	public DataReaderWriter(String url) {
 		this.url = url;
 	}
 	
@@ -70,7 +69,7 @@ public class SocketManagerAndReaderWriter {
 			return builder;
 	}
 	
-	public StringBuilder makePOSTRequestAndSetCookies(SSLSocket socket, URL convertedLink) throws IOException {
+	public void makePOSTRequestAndSetCookies(SSLSocket socket, URL convertedLink) throws IOException {
 		
 		//Make post body to send in the request. Refer to admin page network request for formatting
 		final String POSTBODY = "requestType=" + URLEncoder.encode("reqBuild", "UTF-8") +
@@ -107,20 +106,6 @@ public class SocketManagerAndReaderWriter {
 		}
 		//Close the stream
 		in.close();
-		return builder;
-	}
-	
-	/**
-	 * Method to create a socket
-	 * @param host
-	 * @param port
-	 * @return
-	 * @throws IOException
-	 */
-	public SSLSocket makeSocketForConnection(String host, int port) throws IOException {
-		SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-		SSLSocket socket = (SSLSocket) factory.createSocket(host, port);
-		return socket;
 	}
 	
 	/**
@@ -143,7 +128,7 @@ public class SocketManagerAndReaderWriter {
 	 * @throws IOException 
 	 */
 	public void downloadHTML(String method) throws IOException {
-		//If the method is a get, invoke the normal workflow without worrying about posting credentials
+		SocketManager manager = new SocketManager();
 		if(method == "GET ") {
 			List<String> parsedLinks = getParsedLinks();
 			createSocketsAndWriteWithGET(parsedLinks);
@@ -151,11 +136,7 @@ public class SocketManagerAndReaderWriter {
 			//else, invoke the workflow posting credentials and using the cookies in the response to get the desired page
 			SSLSocket socket;
 			URL convertedLink = new URL(ADMINURL);
-			if(convertedLink.getPort() == -1) {
-				socket = makeSocketForConnection(convertedLink.getHost(), convertedLink.getDefaultPort());
-			} else {
-				socket = makeSocketForConnection(convertedLink.getHost(), convertedLink.getPort());
-			}
+			socket = manager.makeSocketForConnection(convertedLink.getHost(), convertedLink.getDefaultPort());
 			downloadCacheStatsHTML(socket, convertedLink);
 		}
 		
@@ -179,6 +160,7 @@ public class SocketManagerAndReaderWriter {
 	}
 	
 	public void createSocketsAndWriteWithGET(List<String> parsedLinks) throws MalformedURLException {
+		SocketManager manager = new SocketManager();
 		//Loop over the parsed links
 			for(int i = 0; i < parsedLinks.size(); i++) {
 				//Convert each link into a new URL
@@ -186,12 +168,8 @@ public class SocketManagerAndReaderWriter {
 				try{
 					//Instantiate a socket
 					SSLSocket socket;
-					if(convertedLink.getPort() == -1) {
-						//If the port is -1, make the socket with the default port
-						socket = makeSocketForConnection(convertedLink.getHost(), convertedLink.getDefaultPort());			
-					} else {
-						socket = makeSocketForConnection(convertedLink.getHost(), convertedLink.getPort());
-					}
+					//If the port is -1, make the socket with the default port
+					socket = manager.makeSocketForConnection(convertedLink.getHost(), convertedLink.getDefaultPort());			
 						
 					//Instantiate a string builder with makeRequestAndReadInStreamData to be written into file
 					StringBuilder builder = makeRequestAndReadInStreamDataGET(socket, convertedLink);

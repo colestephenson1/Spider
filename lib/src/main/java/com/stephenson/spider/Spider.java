@@ -1,11 +1,15 @@
 package com.stephenson.spider;
 import java.io.IOException;
-import java.util.List;
 
 public class Spider {
 	
 	final String WEBSITE = "https://smt-stage.qa.siliconmtn.com/";
 	
+	/**
+	 * Instantiate the spider and crawl, executing all functionality of the applicattion
+	 * @param args
+	 * @throws IOException
+	 */
 	public static void main(String[] args) throws IOException {
 		
 		Spider shelob = new Spider();
@@ -13,9 +17,13 @@ public class Spider {
 		
 	}
 	
+	/**
+	 * Instantiate a new SocketManagerAndReaderWriter and invoke downloadHTML with both a GET and POST
+	 * @throws IOException
+	 */
 	public void crawl() throws IOException {
-		SocketManagerAndReaderWriter socketManager = new SocketManagerAndReaderWriter(WEBSITE);
-		socketManager.downloadHTML("GET ");
-		socketManager.downloadHTML("POST ");
+		DataReaderWriter drw = new DataReaderWriter(WEBSITE);
+		drw.downloadHTML("GET ");
+		drw.downloadHTML("POST ");
 	}
 }
