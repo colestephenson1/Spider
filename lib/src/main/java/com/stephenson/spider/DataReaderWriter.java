@@ -26,6 +26,10 @@ public class DataReaderWriter {
 	
 	private StringBuilder cookies = new StringBuilder();
 	
+	/**
+	 * Constructor. Takes in a base URL to parse links from.
+	 * @param url
+	 */
 	public DataReaderWriter(String url) {
 		this.url = url;
 	}
@@ -35,7 +39,7 @@ public class DataReaderWriter {
 	 * and read the data stream into a string builder
 	 * @param socket
 	 * @param convertedLink
-	 * @return
+	 * @return stringbuilder with read in data
 	 * @throws IOException
 	 */
 	public StringBuilder makeRequestAndReadInStreamDataGET(SSLSocket socket, URL convertedLink) throws IOException {
@@ -67,8 +71,15 @@ public class DataReaderWriter {
 			in.close();
 			
 			return builder;
-	}
+	};
 	
+	/**
+	 * Formats the POST request and associated headers, and appends all cookies in the response
+	 * to a stringbuilder to be used in the subsequent GET request
+	 * @param socket
+	 * @param convertedLink
+	 * @throws IOException
+	 */
 	public void makePOSTRequestAndSetCookies(SSLSocket socket, URL convertedLink) throws IOException {
 		
 		//Make post body to send in the request. Refer to admin page network request for formatting
@@ -106,11 +117,11 @@ public class DataReaderWriter {
 		}
 		//Close the stream
 		in.close();
-	}
+	};;
 	
 	/**
 	 * Method to get all of the parsed links of the website from the parser
-	 * @return
+	 * @return the list of parsed links
 	 */
 	public List<String> getParsedLinks() {
 		
@@ -120,7 +131,7 @@ public class DataReaderWriter {
 		parser.connectToUrlAndParseLinks();
 		//Return a List of the parsed links from the Jsoup parser
 		return parser.getLinks();
-	}
+	};
 	
 	
 	/**
@@ -138,9 +149,9 @@ public class DataReaderWriter {
 			URL convertedLink = new URL(ADMINURL);
 			socket = manager.makeSocketForConnection(convertedLink.getHost(), convertedLink.getDefaultPort());
 			downloadCacheStatsHTML(socket, convertedLink);
-		}
+		};
 		
-	}
+	};
 	
 	/**
 	 * Method to make post request with credentials
@@ -157,8 +168,14 @@ public class DataReaderWriter {
 		List<String> cacheStats = List.of(CACHESTATS);
 		//Download the HTML
 		createSocketsAndWriteWithGET(cacheStats);
-	}
+	};
 	
+	/**
+	 * Instantiates a socket for each link in a list, creates a string builder using that socket with a GET request,
+	 * and writes it to a local file
+	 * @param parsedLinks
+	 * @throws MalformedURLException
+	 */
 	public void createSocketsAndWriteWithGET(List<String> parsedLinks) throws MalformedURLException {
 		SocketManager manager = new SocketManager();
 		//Loop over the parsed links
@@ -190,18 +207,18 @@ public class DataReaderWriter {
 					
 				} catch (IOException e) {
 					System.out.println(e.getStackTrace());
-				}
-			}
-	}
+				};
+			};
+	};
 	
 	/**
 	 * Method to grab the cookie from the line of data
 	 * @param inData
-	 * @return
+	 * @return cookie
 	 */
 	public String restructureCookie(String inData) {
 		//Grab only the cookie value from the string
 		return inData.split(" ")[1];
-	}
+	};
 	
 }
